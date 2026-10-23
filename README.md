@@ -3,32 +3,35 @@
 Ask your database questions in plain English. Get SQL, results, statistical insights and auto-selected charts.
 
 ## Features
-- **Hybrid query engine:** 50+ rule-based patterns answer common questions instantly. Complex queries (JOINs etc.) go to an LLM with database schema context.
+- **Hybrid query engine:** 50+ rule-based patterns answer common questions instantly. Complex queries (JOINs etc.) go to a local LLM (Ollama) with database schema context.
 - **SQL safety:** every query is validated with sqlglot (single SELECT statement only), so INSERT / UPDATE / DELETE / DROP are blocked.
 - **Insights:** min, max, average and total for numeric columns.
 - **Smart charts:** automatically picks bar, pie or line charts.
 - Dataset Explorer, 33 example prompts, SQL viewer with copy, Recent Runs.
 
 ## Tech Stack
-Next.js, React, TypeScript, Tailwind CSS, shadcn/ui, Recharts, Framer Motion, FastAPI, SQLAlchemy, SQLite, sqlglot, LLM API
+Next.js, React, TypeScript, Tailwind CSS, shadcn/ui, Recharts, Framer Motion, FastAPI, SQLAlchemy, SQLite, sqlglot, Ollama (local LLM)
 
 ## How It Works
-User question → Next.js → FastAPI → keyword engine (else LLM) → sqlglot validation → SQLite → rows + insights + chart
+User question → Next.js → FastAPI → keyword engine (else Ollama LLM) → sqlglot validation → SQLite → rows + insights + chart
 
 ## Setup
 
+### Prerequisites
+- Python 3.10+
+- Node.js 18+
+- [Ollama](https://ollama.com) installed and running
+
 ### Backend
+Pull the model used in `app/llm/ollama_client.py`:
+```bash
+ollama pull MODEL_NAME
+```
+Then:
 ```bash
 python -m venv venv
 source venv/Scripts/activate      # Windows Git Bash
-pip install fastapi uvicorn sqlalchemy sqlglot pydantic python-dotenv google-generativeai
-```
-Create a `.env` file with your API key:
-```
-GEMINI_API_KEY=your_key_here
-```
-Seed the database and run:
-```bash
+pip install fastapi uvicorn sqlalchemy sqlglot pydantic python-dotenv requests
 python -m app.db.init_db
 uvicorn app.main:app --reload --port 8000
 ```
